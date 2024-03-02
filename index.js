@@ -7,8 +7,8 @@ const cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 const session = require("express-session");
 
-// const base_url = "http://localhost:3000";
-const base_url = "node59627-movie-streaming.proen.app.ruk-com.cloud:11935";
+const base_url = "http://localhost:3000";
+// const base_url = "http://node59627-movie-streaming.proen.app.ruk-com.cloud";
 
 app.set("views", path.join(__dirname, "/public/views"));
 app.set("view engine", "ejs");
