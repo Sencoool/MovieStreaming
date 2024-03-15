@@ -296,7 +296,10 @@ app.post("/login", async (req, res) => {
   try {
     const { name, password } = req.body;
     const user = await User.findOne({ where: { name } });
-    if (!user) return res.json({ message: "User_not_found" });
+    console.log(user + "Hello");
+    if (!user) {
+      return res.json({ message: "User_not_found" });
+    }
 
     if (user.password !== password)
       return res.json({ message: "Wrong_Password" });

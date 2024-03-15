@@ -56,6 +56,7 @@ app.get("/", async (req, res) => {
     req.session.checkUserDupe = "";
     req.session.checkLogin = "";
     req.session.favoriteStatus2 = "";
+    console.log(req.session);
     console.log(req.session.movieData, "moviedata");
     const response = await axios.get(base_url + "/movies");
 
@@ -93,7 +94,7 @@ app.get("/movie/:id", async (req, res) => {
     }
     const response2 = await axios.get(base_url + "/movie/" + req.params.id);
     req.session.movieid = response2.data[1].movie_id;
-    console.log(response2.data[0]);
+    // console.log(response2.data[0]);
     res.render("movie", {
       movie: response2.data[1],
       moviedata: req.session.movieData,
@@ -138,29 +139,44 @@ app.get("/create", onlyAdmin, (req, res) => {
   }
 });
 
+app.get("/update/:id", onlyAdmin, async (req, res) => {
+  try {
+    const response = await axios.get(base_url + "/movie/" + req.params.id);
+    res.render("update", {
+      movies: response.data[1],
+      moviedata: req.session.movieData,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("error in /update/:id");
+    res.redirect("/");
+  }
+});
+
 app.post(
-  "/create",
+  "/update/:id",
   onlyAdmin,
   upload.single("imageFile"),
-  async (req, res, next) => {
+  async (req, res) => {
     try {
-      const data = {
+      let data = {
         title: req.body.title,
         director: req.body.director,
         type: req.body.type,
-        desc: req.body.desc,
+        teaser_url: req.body.teaser_url,
         release_date: req.body.release_date,
         rating: req.body.rating,
         genre: req.body.genre,
         running_time: req.body.running_time,
       };
+      if (req.desc) data.desc = req.body.desc;
       if (req.file) data.imageFile = req.file.filename;
-      if (req.body.teaser_url) data.teaser_url = req.body.teaser_url;
-      await axios.post(base_url + "/movies", data);
-      res.redirect("/");
+      console.log(data);
+      await axios.put(base_url + "/movie/" + req.params.id, data);
+      res.redirect("/movies");
     } catch (err) {
       console.error(err);
-      res.status(500).send("error in /create");
+      res.status(500).send("error in /update/:id");
       res.redirect("/");
     }
   }
@@ -368,6 +384,9 @@ app.get("/favorite/:id", authenticateUser, async (req, res) => {
       const response = await axios.get(
         base_url + "/favorite/" + req.session.movieData.user_id
       );
+
+      console.log(response, "Hello");
+
       res.render("favorite", {
         movies: response.data,
         moviedata: req.session.movieData,
